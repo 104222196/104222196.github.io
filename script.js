@@ -1,18 +1,17 @@
 function init() {
-  const width = 1500;
+  const width = 500;
 
-  const height = 700;
+  const height = 500;
   const svg = d3
     .select("#chart")
     .append("svg")
     .attr("width", width)
     .attr("height", height);
-  5;
 
   const projection = d3
     .geoMercator()
     .scale(120)
-    .translate([width / 2, height / 2]);
+    .translate([width / 2, height / 2+100]);
 
   const path = d3.geoPath(projection);
 
