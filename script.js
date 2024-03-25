@@ -1,4 +1,4 @@
-function init() {
+function drawChoro() {
   const width = 500;
 
   const height = 500;
@@ -32,4 +32,4 @@ function init() {
   });
 }
 
-window.onload = init;
+drawChoro();

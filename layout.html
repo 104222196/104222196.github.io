@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Data Visualisation Exercise 2.1" />
+    <meta name="keywords" content="Drawing with SVG - Binding" />
+    <meta name="author" content="Nguyen Quang Huy" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 1</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+    <link href="./navigation_bar.css" rel="stylesheet">
+
+    <!-- Importing D3.js library -->
+    <script src="//d3js.org/d3.v6.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <script src="navigation_bar.js" defer></script>
+    <script src="section_2.js" defer></script>
+    
+    <script src="script.js" defer></script>
+    <script src="bumpchart.js" defer></script>
+</head>
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", sans-serif;
+    }
+
+    body {
+        overflow: hidden;
+        color: #0F2C59;
+    }
+
+    .parent {
+        scroll-snap-type: y mandatory;
+        height: 100vh;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+    }
+
+    .section {
+        height: 100vh;
+        height: 100dvh;
+        scroll-snap-align: start;
+        padding: 2rem;
+    }
+
+    .section-light {
+        background-color: #F8F0E5;
+    }
+
+    .section-dark {
+        background-color: #EADBC8;
+    }
+
+    h1 {
+        font-size: 3rem;
+    }
+
+    .center {
+        max-width: 64rem;
+        margin: 0 auto;
+    }
+</style>
+<body>
+    <nav class="navigation">
+        <ul>
+            <li><a href="#section-1" class="active"></a></li>
+            <li><a href="#section-2"></a></li>
+            <li><a href="#section-3"></a></li>
+            <li><a href="#section-4"></a></li>
+            <li><a href="#section-5"></a></li>
+            <li><a href="#section-6"></a></li>
+            <li><a href="#section-7"></a></li>
+            <li><a href="#section-8"></a></li>
+            <li><a href="#section-9"></a></li>
+            <li><a href="#section-10"></a></li>
+        </ul>
+    </nav>
+    <div class="parent">
+        <div id="section-1" class="section section-light">
+            <h1>International student migration around the world.</h1>
+        </div>
+        <div id="section-2" class="section section-dark">
+            <h1>In 2021, about 3.5% of the world population were migrants. That was 281 million people in total.</h1>
+        </div>
+        <div id="section-3" class="section section-light">
+            <h1>Among these migrants, about 2.2% are students.</h1>
+            <p>Another waffle chart here.</p>
+        </div>
+        <div id="section-4" class="section section-dark">
+            <h1>These are the top destination countries for international students.</h1>
+        </div>
+        <div id="section-5" class="section section-light">
+            <h1>Here's a closer look at where students to said countries came from.</h1>
+        </div>
+        <div id="section-6" class="section section-dark">
+            <h1>These were the top source countries of international students.</h1>
+            <div id="bump"></div>
+        </div>
+        <div id="section-7" class="section section-light">
+            <h1>Here's a breakdown of where students from these countries went to.</h1>
+        </div>
+        <div id="section-8" class="section section-dark">
+            <h1>Key takeaways</h1>
+        </div>
+        <div id="section-9" class="section section-light">
+            <h1>Explore more</h1>
+            <p id="chart"></p>
+        </div>
+        <div id="section-10" class="section section-dark">
+            <h1>References</h1>
+        </div>
+    </div>
+</body>
+<footer>COS30045 Data Visualisation</footer>
+</html>

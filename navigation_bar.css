@@ -1,0 +1,48 @@
+.navigation {
+    position: fixed;
+    top: 50%;
+    left: 90%;
+    transform: translateY(-50%);
+
+    --link-circle-radius: 2rem;
+}
+
+.navigation ul {
+    display: grid;
+    list-style: none;
+    position: relative;
+    overflow-y: clip;
+}
+
+.navigation li {
+    position: relative;
+    height: 4rem;
+}
+
+.navigation a {
+    display: block;
+    position: absolute;
+    width: var(--link-circle-radius);
+    height: var(--link-circle-radius);
+    background-color: transparent;
+    border: solid 4px #0F2C59;
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+    border-radius: 100%;
+}
+
+.navigation a.active {
+    background-color: #0F2C59;
+}
+
+.navigation li:not(:last-child):after {
+    content: "";
+    position: absolute;
+    width: 0.25rem;
+    height: 50%;
+    top: 75%;
+    left: 0;
+    transform: translate(-50%);
+    background-color: #0F2C59;
+}

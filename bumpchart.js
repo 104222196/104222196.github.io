@@ -177,8 +177,8 @@ function init() {
         .filter((s) => s !== d)
         .transition()
         .duration(300)
-        .attr("fill", "#ddd")
-        .attr("stroke", "#ddd");
+        .attr("fill", "#F8F0E5")
+        .attr("stroke", "#F8F0E5");
       markTick(leftY, 0);
       markTick(rightY, years.length - 1);
 
