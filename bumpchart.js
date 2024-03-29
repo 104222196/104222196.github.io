@@ -41,7 +41,6 @@ function init() {
       return matrix;
     }
     const chartData = createChartData(countries, years, data);
-    console.log(chartData);
 
     function calculateRanking(years, chartData, countries) {
       const len = years.length - 1;
@@ -212,7 +211,7 @@ function init() {
     }
   }
 
-  d3.csv("top10source.csv").then(function (data) {
+  d3.csv("./dataset/top10source.csv").then(function (data) {
     data.forEach(function (d) {
       d.year = +d.year;
       d.student = +d.student;
