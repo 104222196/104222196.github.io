@@ -8,12 +8,51 @@
     <meta name="author" content="Nguyen Quang Huy" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assignment 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <!-- Importing D3.js library -->
-    <script src="//d3js.org/d3.v6.min.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://unpkg.com/d3-array@1"></script>
+<script src="https://unpkg.com/d3-collection@1"></script>
+<script src="https://unpkg.com/d3-path@1"></script>
+<script src="https://unpkg.com/d3-shape@1"></script>
+<script src="https://unpkg.com/d3-sankey@0"></script>
+
+
+    <style>
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+        html {
+            font-family: "Inter", sans-serif;
+            background-color: #F8F0E5;
+        }
+
+        .link {
+            fill: none;
+            stroke: #000;
+            stroke-opacity: .2;
+        }
+
+        .link:hover {
+            stroke-opacity: .5;
+        }
+    </style>
 </head>
+
 <body>
-    <div id="bump"></div>
+    <div>
+        <span id="bump"></span>
+        <span id="sankey"></span>
+    </div>
+    <p id="responder"></p>
+
+    <script src="bumpchart.js"></script>
+    <script src="sankey.js"></script>
+
+    <footer>COS30045 Data Visualisation</footer>
 </body>
-<script src="bumpchart.js"></script>
-<footer>COS30045 Data Visualisation</footer>
+
+
 </html>
