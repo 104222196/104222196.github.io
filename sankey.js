@@ -1,7 +1,7 @@
 // set the dimensions and sankeyDiagramMarginss of the graph
-const sankeyDiagramMargins = { top: 10, right: 10, bottom: 10, left: 10 },
+const sankeyDiagramMargins = { top: 10, right: 0, bottom: 10, left: 0 },
     sankeyDiagramWidth = 800 - sankeyDiagramMargins.left - sankeyDiagramMargins.right,
-    sankeyDiagramHeight = 600 - sankeyDiagramMargins.top - sankeyDiagramMargins.bottom;
+    sankeyDiagramHeight = 450 - sankeyDiagramMargins.top - sankeyDiagramMargins.bottom;
 
 // Color scale used
 const color = d3.scaleOrdinal(d3.schemeTableau10);
@@ -13,6 +13,9 @@ const sankey = d3.sankey()
     .nodeWidth(36)
     .nodePadding(8)
     .size([sankeyDiagramWidth, sankeyDiagramHeight]);
+
+const sankeyTitle = document.querySelector("#sankey-title");
+const lineChart = document.querySelector("#line-chart");
 
 // append the svg object to the body of the page
 const svg = d3.select("#sankey")
@@ -34,13 +37,17 @@ d3.csv("./dataset/final.csv").then(data => {
     drawSankey(data, "China");
 
     document.getElementById("sankey").addEventListener("seriesLocked", (e) => {
-        console.log(e.detail);
+        sankeyTitle.textContent = `Preferred destination of students from ${e.detail} from 2017 to 2021`;
         drawSankey(data, e.detail);
     });
 });
 
 function drawSankey(data, sourceCountry) {
     const countryData = data.filter(e => e.source === sourceCountry);
+
+    const obj = { }
+    obj[sourceCountry] = countryData.map(e => e.destination);
+    console.log(obj);
 
     const links = countryData.map(d => ({ source: d.source, target: d.destination, value: d.students }));
     const nodes = Array.from(new Set(countryData.flatMap(d => [d.source, d.destination])), name => ({ name: name }));
@@ -89,12 +96,22 @@ function drawSankey(data, sourceCountry) {
                             .on("mouseover", function (e, d) {
                                 d3.select(this)
                                     .attr("stroke", d => `url(#gradient-${d.index}-darker)`);
-
-                                    console.log(d)
                             })
                             .on("mouseout", function (e, d) {
                                 d3.select(this)
                                     .attr("stroke", d => `url(#gradient-${d.index})`);
+                            })
+                            .on("click", function (e, d) {
+                                console.log(d)
+                                const customData = {
+                                    source: d.source.name,
+                                    destination: d.target.name,
+                                    color: color(d.target.index)
+                                };
+
+                                lineChart.dispatchEvent(new CustomEvent("sourceDestinationLocked", {
+                                    detail: customData
+                                }));
                             });
             });
             
@@ -145,7 +162,6 @@ function drawSankey(data, sourceCountry) {
                             .attr("width", sankey.nodeWidth())
                             .attr("height", d => d.y1 - d.y0)
                             .style("fill", d => color(d.index))
-                            //.style("stroke", d => d3.rgb(color(d.index)).darker(2));
 
                 nodeItemGroup.select("rect")
                             .selectAll("title")

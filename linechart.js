@@ -1,149 +1,103 @@
-function init() {
-  const lineData = [
-    {
-      values: [
-        { date: "2020/01/01", total: 230 },
-        { date: "2020/02/01", total: 290 },
-        { date: "2020/03/01", total: 230 },
-        { date: "2020/04/01", total: 270 },
-        { date: "2020/05/01", total: 244 },
-        { date: "2020/06/01", total: 270 },
-        { date: "2020/07/01", total: 320 },
-        { date: "2020/08/01", total: 320 },
-        { date: "2020/09/01", total: 250 },
-        { date: "2020/10/01", total: 272 },
-      ],
-    },
-  ];
-  // Selecting the element
-  const element = document.getElementById("line-chart");
+// Setting dimensions
+const lineChartMagins = { top: 20, right: 20, bottom: 20, left: 64 },
+	lineChartWidth = 800 - lineChartMagins.left - lineChartMagins.right,
+	lineChartHeight = 250 - lineChartMagins.top - lineChartMagins.bottom;
 
-  // Setting dimensions
-  const margin = { top: 40, right: 30, bottom: 7, left: 50 },
-    width = 900 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+const lineChartTitle = document.querySelector("#line-title");
 
-  // Parsing timestamps
-  const parseTime = d3.timeParse("%Y/%m/%d");
+// Appending svg to a selected element
+const lineChartSvg = d3
+	.select("#line-chart")
+	.append("svg")
+	.attr("width", lineChartWidth + lineChartMagins.left + lineChartMagins.right)
+	.attr("height", 300 + lineChartMagins.top + lineChartMagins.bottom)
+	.attr("viewBox", `0 40 ${lineChartWidth + 80} ${lineChartHeight}`)
+	.append("g")
+	.attr("transform", `translate(${lineChartMagins.left}, ${lineChartMagins.top})`);
 
-  const parsedData = lineData.map((item) => ({
-    values: item.values.map((val) => ({
-      total: val.total,
-      date: parseTime(val.date),
-    })),
-  }));
+const lineChartXGroup = lineChartSvg.append("g")
+									.attr("id", "#xAxis")
+									.attr("font-weight", "bold")
+									.attr("font-size", "1rem")
+									.attr("transform", "translate(0," + lineChartHeight + ")");
 
-  // Appending svg to a selected element
-  const svg = d3
-    .select(element)
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", 300 + margin.top + margin.bottom)
-    .attr("viewBox", `0 40 ${width + 80} ${height}`)
-    .append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+const lineChartYGroup = lineChartSvg.append("g")
+									.attr("id", "#yAxis")
+									.attr("font-weight", "bold")
+									.attr("font-size", "1rem");
 
-  // Setting X,Y scale ranges
-  const xScale = d3
-    .scaleTime()
-    .domain([
-      d3.min(parsedData, (d) => d3.min(d.values, (v) => v.date)),
-      d3.max(parsedData, (d) => d3.max(d.values, (v) => v.date)),
-    ])
-    .range([0, width]);
+const linePath = lineChartSvg.append("path")
+							.attr("stroke-width", "2")
+							.style("fill", "none");
 
-  const yScale = d3
-    .scaleLinear()
-    .domain([
-      d3.min(parsedData, (d) => d3.min(d.values, (v) => v.total)),
-      d3.max(parsedData, (d) => d3.max(d.values, (v) => v.total)),
-    ])
-    .range([height, 0]);
+const lineArea = lineChartSvg.append("path").attr("opacity", .5);
 
-  const chartSvg = svg.selectAll(".line").data(parsedData).enter();
+function drawLineChart(data, sourceCountry, destinationCountry, color) {
+	const sourceDestinationPair = data[sourceCountry][destinationCountry];
 
-  // Drawing line with inner gradient and area
-  // Adding functionality to make line and area curved
-  const line = d3
-    .line()
-    .x(function (d) {
-      return xScale(d.date);
-    })
-    .y(function (d) {
-      return yScale(d.total);
-    })
-    .curve(d3.curveCatmullRom.alpha(0.5));
+	const chartData = Object.keys(sourceDestinationPair).map(year => ({
+		year: year,
+		students: sourceDestinationPair[year]
+	})).filter(e => e.students !== null);
 
-  // Defining the area, which appear after animation ends
-  const area = d3
-    .area()
-    .x(function (d) {
-      return xScale(d.date);
-    })
-    .y0(height)
-    .y1(function (d) {
-      return yScale(d.total);
-    })
-    .curve(d3.curveCatmullRom.alpha(0.5));
+	// Setting X,Y scale ranges
+	const xScale = d3
+		.scaleTime()
+		.domain([new Date(2017, 0), new Date(2021, 0)])
+		.range([0, lineChartWidth]);
 
-  // Defining the line path and adding some styles
-  const path = chartSvg
-    .append("path")
-    .attr("d", function (d) {
-      return line(d.values);
-    })
-    .attr("stroke-width", "2")
-    .style("fill", "none")
-    .attr("stroke", "#ff6f3c");
+	const yScale = d3
+		.scaleLinear()
+		.domain([0, d3.max(chartData, (e) => e.students)])
+		.range([lineChartHeight, 0]);
 
-  // Drawing animated area
-  chartSvg
-    .append("path")
-    .attr("d", function (d) {
-      return area(d.values);
-    })
-    .style("fill", "rgba(255,111,60,0.15)");
+	// Adding the x Axis
+	lineChartXGroup.transition()
+					.duration(300)
+					.call(d3.axisBottom(xScale).ticks(d3.timeYear.every(1)));
 
-  // Adding the x Axis
-  svg
-    .append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(xScale));
+	// Adding the y Axis
+	lineChartYGroup.transition()
+					.duration(300)
+					.call(d3.axisLeft(yScale));
 
-  // Adding the y Axis
-  svg.append("g").call(d3.axisLeft(yScale));
-  const zeroArea = d3
-    .area()
-    .x(function (d) {
-      return xScale(d.date);
-    })
-    .y0(height)
-    .y1(function () {
-      return 0;
-    })
-    .curve(d3.curveCatmullRom.alpha(0.5));
+	// Drawing line with inner gradient and area
+	const line = d3.line()
+		.x(d => xScale(new Date(d.year, 0)))
+		.y(d => yScale(d.students));
 
-  chartSvg
-    .append("path")
-    .attr("d", function (d) {
-      return zeroArea(d.values);
-    })
-    .style("fill", "rgba(255,111,60,0.15)")
-    .transition()
-    .duration(1500)
-    .attr("d", function (d) {
-      return area(d.values);
-    })
-    .style("fill", "rgba(255,111,60,0.15)");
-  const length = path.node().getTotalLength(); // Get line length
-  path
-    .attr("stroke-dasharray", length + " " + length)
-    .attr("stroke-dashoffset", length)
-    .transition()
-    .ease(d3.easeLinear)
-    .attr("stroke-dashoffset", 0)
-    .delay(1500)
-    .duration(3000);
+	const area = d3
+		.area()
+		.x(d => xScale(new Date(d.year, 0)))
+		.y0(lineChartHeight)
+		.y1(d => yScale(d.students));
+
+	// Defining the line path and adding some styles
+	linePath.attr("d", line(chartData))
+			.attr("stroke", color);
+		
+	lineChartSvg.selectAll("circle")
+		.data(chartData)
+		.join("circle")
+		.attr("cx", d => xScale(new Date(d.year)))
+		.attr("cy", d => yScale(d.students))
+		.attr("r", 4)
+		.attr("stroke", color)
+		.attr("fill", "white")
+
+	// Drawing animated area
+	lineArea.attr("d", area(chartData))
+			.attr("fill", color)
 }
 
-window.onload = init;
+d3.json("./dataset/source_destination_pair.json").then(data => {
+	drawLineChart(data, "China", "Australia", "rgb(242, 142, 44)");
+
+	document.querySelector("#line-chart").addEventListener("sourceDestinationLocked", (e) => {
+		const { source, destination, color } = e.detail;
+
+		lineChartTitle.textContent = `Number of students from ${source} to ${destination} between 2017 and 2021`
+		drawLineChart(data, source, destination, color);
+	});
+});
+

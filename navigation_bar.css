@@ -1,7 +1,7 @@
 .navigation {
     position: fixed;
     top: 50%;
-    left: 90%;
+    left: 97.5%;
     transform: translateY(-50%);
 
     --link-circle-radius: 2rem;

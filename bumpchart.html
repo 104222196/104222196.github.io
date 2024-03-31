@@ -12,10 +12,10 @@
     <!-- Importing D3.js library -->
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="https://unpkg.com/d3-array@1"></script>
-<script src="https://unpkg.com/d3-collection@1"></script>
-<script src="https://unpkg.com/d3-path@1"></script>
-<script src="https://unpkg.com/d3-shape@1"></script>
-<script src="https://unpkg.com/d3-sankey@0"></script>
+    <script src="https://unpkg.com/d3-collection@1"></script>
+    <script src="https://unpkg.com/d3-path@1"></script>
+    <script src="https://unpkg.com/d3-shape@1"></script>
+    <script src="https://unpkg.com/d3-sankey@0"></script>
 
 
     <style>
@@ -23,30 +23,34 @@
             box-sizing: border-box;
             padding: 0;
             margin: 0;
-        }
-        html {
+            color: #0F2C59;
             font-family: "Inter", sans-serif;
+        }
+
+        html {
             background-color: #F8F0E5;
-        }
-
-        .link {
-            fill: none;
-            stroke: #000;
-            stroke-opacity: .2;
-        }
-
-        .link:hover {
-            stroke-opacity: .5;
         }
     </style>
 </head>
 
 <body>
+    <h1>International student migration around the world - origins and destinations</h1>
+    <p>by Ta Quang Tung, Nguyen Quang Huy</p>
+    <p>Thanks to greater economic prosperity and the convenience of international travel, people are becoming more
+        mobile than before. No longer are people tied down to their country of origin - they can now travel the world to
+        look for a better life in other countries. Among these migrants, many leave their homes in search of better
+        educational opportunities. Between 2017 and 2021, an estimated 30 million people migrated to study overseas.
+        These international students play an important cultural and socio-economic role in the places they arrive at.
+        This visualization project aims to give readers an overview of international student migration by looking at
+        where these students came from and where they headed.</p>
+
+    <h2>Origins of international students</h2>
     <div>
         <span id="bump"></span>
         <span id="sankey"></span>
     </div>
-    <p id="responder"></p>
+
+    <h2>Destinations of international students</h2>
 
     <script src="bumpchart.js"></script>
     <script src="sankey.js"></script>

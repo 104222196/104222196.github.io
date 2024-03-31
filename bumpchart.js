@@ -1,5 +1,5 @@
 const w = 950;
-const h = 700;
+const h = 600;
 const bumpRadius = 10;
 const padding = 20;
 const margin = { left: 175, right: 175, top: 20, bottom: 50 };
@@ -7,9 +7,15 @@ const margin = { left: 175, right: 175, top: 20, bottom: 50 };
 let isSeriesLocked = false;
 const sankeyDiagram = document.getElementById("sankey");
 
-function drawBumpChart(data) {
+function seq(start, length) {
+	return Array.apply(null, { length: length }).map((d, i) => i + start);
+}
+
+function drawBumpChart(rootId, data, headerOptions, rankingLimit) {
+	const { categoryColumn, timeColumn, comparisonColumn } = headerOptions;
+
 	const svg = d3
-		.select("#bump")
+		.select(rootId)
 		.append("svg")
 		.attr("width", w)
 		.attr("height", h);
@@ -26,70 +32,59 @@ function drawBumpChart(data) {
 			unhideAllSeries();
 		});
 
-	let seq = (start, length) =>
-		Array.apply(null, { length: length }).map((d, i) => i + start);
+	const categories = Array.from(new Set(data.map(d => d[categoryColumn])));
+	const timePoints = Array.from(new Set(data.map(d => d[timeColumn])));
 
-	console.log(seq(5, 15))
+	// Getting the matrix
+	const categoryIndex = new Map(categories.map((category, i) => [category, i]));
+	const timePointIndex = new Map(timePoints.map((timePoint, i) => [timePoint, i]));
 
-	const countries = Array.from(new Set(data.map(d => d.country)));
-	const years = Array.from(new Set(data.map(d => d.year)));
+	const matrix = Array.from(categories, () => new Array(timePoints.length).fill(null));
 
+	// attach category name to each row in the matrix
+	matrix.forEach((row, index) => row.category = categories[index]);
 
-	function createChartData(countries, years, data) {
-		const ci = new Map(countries.map((country, i) => [country, i]));
-		const yi = new Map(years.map((year, i) => [year, i]));
+	for (const dataItem of data) {
+		const category = dataItem[categoryColumn];
+		const timePoint = dataItem[timeColumn];
+		const comparisonValue = dataItem[comparisonColumn];
 
-		const matrix = Array.from(ci, () => new Array(years.length).fill(null));
+		matrix[categoryIndex.get(category)][timePointIndex.get(timePoint)] = {
+			time: timePoint,
+			rank: 0,
+			value: +comparisonValue,
+			next: null,
+		};
+	}
 
-		// attach country name to each row in the matrix
-		matrix.forEach((row, index) => row.country = countries[index]);
-
-		for (const { country, year, student } of data) {
-			matrix[ci.get(country)][yi.get(year)] = {
-				rank: 0,
-				student: +student,
-				next: null,
-			};
+	matrix.forEach(row => {
+		for (let i = 0; i < row.length - 1; i++) {
+			if (row[i]) row[i].next = row[i + 1];
 		}
+	});
 
-		matrix.forEach((d) => {
-			for (let i = 0; i < d.length - 1; i++) d[i].next = d[i + 1];
-		});
+	timePoints.forEach((_, timePointIndex) => {
+		let array = [];
+		matrix.forEach(row => array.push(row[timePointIndex]));
+		array = array.filter(e => e !== null);
+		array.sort((a, b) => b.value - a.value);
+		array.forEach((cell, j) => cell.rank = j);
+	});
 
-		years.forEach((d, yearIndex) => {
-			const array = [];
-			matrix.forEach(country => array.push(country[yearIndex]));
-			array.sort((a, b) => b.student - a.student);
-			array.forEach((countryInYear, j) => countryInYear.rank = j);
-		});
-
-		return matrix;
-	}
-
-	const chartData = createChartData(countries, years, data);
-
-	function calculateRanking(years, chartData, countries) {
-		const len = years.length - 1;
-		return chartData.map((d, i) => ({
-			country: countries[i],
-			first: d[0].rank,
-			last: d[len].rank,
-		}));
-	}
 	// An array of countries and their rankings at the start and end of the period.
-	const ranking = calculateRanking(years, chartData, countries);
+	const ranking = matrix.map((d, i) => ({
+		category: categories[i],
+		first: d[0] ? d[0].rank : rankingLimit + 1,
+		last: d[timePoints.length - 1] ? d[timePoints.length - 1].rank : rankingLimit + 1,
+	}));
 
-	console.log(ranking)
-
-
-
-	var color = d3
+	const color = d3
 		.scaleOrdinal(d3.schemeTableau10)
 		.domain(seq(0, ranking.length));
 
 	// COuntry lists on the left and right axes.
-	var left = ranking.sort((a, b) => a.first - b.first).map((d) => d.country);
-	var right = ranking.sort((a, b) => a.last - b.last).map((d) => d.country);
+	const left = ranking.sort((a, b) => a.first - b.first).map((d) => d.category).slice(0, rankingLimit);
+	const right = ranking.sort((a, b) => a.last - b.last).map((d) => d.category).slice(0, rankingLimit);
 
 	// AXIS RELATED STUFF
 
@@ -105,24 +100,24 @@ function drawBumpChart(data) {
 
 	const ax = d3
 		.scalePoint()
-		.domain(years)
+		.domain(timePoints)
 		.range([margin.left + padding, w - margin.right - padding]);
 
-	var bx = d3
+	const bx = d3
 		.scalePoint()
-		.domain(seq(0, years.length))
+		.domain(seq(0, timePoints.length))
 		.range([0, w - margin.left - margin.right - padding * 2]);
 
-	var by = d3
+	const by = d3
 		.scalePoint()
-		.domain(seq(0, ranking.length))
+		.domain(seq(0, rankingLimit))
 		.range([margin.top, h - margin.bottom - padding]);
 
 	// Faint vertical line behind each year's ranking column?
 	svg.append("g")
 		.attr("transform", `translate(${margin.left + padding},0)`)
 		.selectAll("path")
-		.data(seq(0, years.length))
+		.data(seq(0, timePoints.length))
 		.join("path")
 		.attr("stroke", "#ccc")
 		.attr("stroke-width", 1)
@@ -152,15 +147,17 @@ function drawBumpChart(data) {
 		.append("g")
 		.call((g) => drawAxis(g, margin.left, 0, d3.axisLeft(y.domain(left)), false));
 
-		leftY.selectAll("text")
+	leftY.selectAll("text")
 		.attr("font-family", "Inter")
 		.attr("font-size", ".8rem");
+
 	const rightY = svg
 		.append("g")
 		.call((g) =>
 			drawAxis(g, w - margin.right, 0, d3.axisRight(y.domain(right)))
 		);
-		rightY
+
+	rightY
 		.selectAll("text")
 		.attr("font-family", "Inter")
 		.attr("font-size", ".8rem");
@@ -169,12 +166,12 @@ function drawBumpChart(data) {
 
 	const series = svg
 		.selectAll(".series")
-		.data(chartData) // an array of countries. each country is an array of years.
+		.data(matrix) // an array of countries. each country is an array of years.
 		.join("g")
+		.each(function (_, i) { this.color = color(i); })
 		.attr("class", "series")
-		.attr("opacity", 1)
-		.attr("fill", (d) => color(d[0].rank))
-		.attr("stroke", (d) => color(d[0].rank))
+		.attr("fill", (d, i) => color(i))
+		.attr("stroke", (d, i) => color(i))
 		.attr("cursor", "pointer")
 		.attr("transform", `translate(${margin.left + padding}, 0)`)
 		.on("mouseover", (e, d) => {
@@ -190,43 +187,37 @@ function drawBumpChart(data) {
 			}
 		})
 		.on("click", (e, d) => {
-			console.log(d)
 			isSeriesLocked = true;
-			console.log(d.country)
-			sankeyDiagram.dispatchEvent(new CustomEvent("seriesLocked", { detail: d.country }));
+			sankeyDiagram.dispatchEvent(new CustomEvent("seriesLocked", { detail: d.category }));
 			hideAllSeries();
 			highlightSeries(d);
 		});
 
 	series
 		.selectAll("path")
-		.data((d) => d)
+		.data((d) => d.filter(e => e !== null))
 		.join("path")
 		.attr("stroke-width", 3)
 		.attr("d", (d, i) => {
 			if (d.next)
 				return d3.line()([
-					[bx(i), by(d.rank)],
-					[bx(i + 1), by(d.next.rank)],
+					[bx(timePointIndex.get(d.time)), by(d.rank)],
+					[bx(timePointIndex.get(d.next.time)), by(d.next.rank)],
 				]);
 		});
 
 	const bumps = series
 		.selectAll("g")
 		.data((d, i) => {
-			console.log(d, i);
-			const ret = d.map((v) => ({ country: countries[i], student: v, first: d[0].rank }))
-			console.log(ret)
-			return ret
+			return d.filter(e => e !== null).map((v) => ({ category: categories[i], value: v }));
 		}
 
 		)
 		.join("g")
-		.attr("transform", (d, i) => `translate(${bx(i)},${by(d.student.rank)})`)
+		.attr("transform", (d, i) => `translate(${bx(timePointIndex.get(d.value.time))},${by(d.value.rank)})`)
 		.call((g) =>
-			g
-				.append("title")
-				.text((d, i) => `${d.country} - ${years[i]}\nNumber of students: ${d.student.student}`)
+			g.append("title")
+				.text((d, i) => `${d.category} - ${d.value.time}\nNumber of students: ${d.value.value}`)
 		);
 
 	bumps.append("circle").attr("r", bumpRadius);
@@ -240,9 +231,9 @@ function drawBumpChart(data) {
 		.attr("font-family", "Inter")
 		.style("font-weight", "bold")
 		.style("font-size", "12px")
-		.text((d) => d.student.rank + 1);
+		.text((d) => d.value.rank + 1);
 
-	
+
 
 	function hideAllSeries() {
 		series.transition()
@@ -258,73 +249,81 @@ function drawBumpChart(data) {
 		leftY.selectAll(".tick text")
 			.transition()
 			.duration(300)
-			.attr("fill", "black")
+			.attr("fill", "#0F2C59")
 
 		rightY.selectAll(".tick text")
 			.transition()
 			.duration(300)
-			.attr("fill", "black")
+			.attr("fill", "#0F2C59")
 	}
 
 	function highlightSeries(datumOfTarget) {
 		const targetSeries = series.filter(datum => datum === datumOfTarget);
+		const originalColor = targetSeries.node().color;
 
-		console.log(datumOfTarget)
-		
 		targetSeries.transition()
 			.duration(300)
-			.attr("fill", (datum) => color(datum[0].rank))
-			.attr("stroke", (datum) => color(datum[0].rank));
+			.attr("fill", originalColor)
+			.attr("stroke", originalColor);
 
 		targetSeries.selectAll("text")
 			.transition()
 			.duration(300)
 			.attr("fill", "white");
 
-		leftY.selectAll(".tick text")
-			.filter((datum, index) => index === datumOfTarget[0].rank)
-			.transition()
-			.duration(300)
-			.attr("fill", (datum) => color(datumOfTarget[0].rank));
+		if (datumOfTarget[0]) {
+			leftY.selectAll(".tick text")
+				.filter((datum, index) => index === datumOfTarget[0].rank)
+				.transition()
+				.duration(300)
+				.attr("fill", originalColor);
+		}
 
-		rightY.selectAll(".tick text")
-			.filter((datum, index) => index === datumOfTarget[datumOfTarget.length - 1].rank)
-			.transition()
-			.duration(300)
-			.attr("fill", (datum) => color(datumOfTarget[0].rank));
+		if (datumOfTarget[datumOfTarget.length - 1]) {
+			rightY.selectAll(".tick text")
+				.filter((datum, index) => index === datumOfTarget[datumOfTarget.length - 1].rank)
+				.transition()
+				.duration(300)
+				.attr("fill", originalColor);
+		}
 	}
 
 	function unhighlightSeries(datumOfTarget) {
 		const targetSeries = series.filter(datum => datum === datumOfTarget);
-		
+		const originalColor = targetSeries.node().color;
+
 		targetSeries.transition()
 			.duration(300)
-			.attr("fill", (datum) => color(datum[0].rank))
-			.attr("stroke", (datum) => color(datum[0].rank));
+			.attr("fill", originalColor)
+			.attr("stroke", originalColor);
 
 		targetSeries.selectAll("text")
 			.transition()
 			.duration(300)
 			.attr("fill", "transparent");
 
-		leftY.selectAll(".tick text")
-			.filter((datum, index) => index === datumOfTarget[0].rank)
-			.transition()
-			.duration(300)
-			.attr("fill", "black");
+		if (datumOfTarget[0]) {
+			leftY.selectAll(".tick text")
+				.filter((datum, index) => index === datumOfTarget[0].rank)
+				.transition()
+				.duration(300)
+				.attr("fill", "#0F2C59");
+		}
 
-		rightY.selectAll(".tick text")
-			.filter((datum, index) => index === datumOfTarget[datumOfTarget.length - 1].rank)
-			.transition()
-			.duration(300)
-			.attr("fill", "black");
+		if (datumOfTarget[datumOfTarget.length - 1]) {
+			rightY.selectAll(".tick text")
+				.filter((datum, index) => index === datumOfTarget[datumOfTarget.length - 1].rank)
+				.transition()
+				.duration(300)
+				.attr("fill", "#0F2C59");
+		}
 	}
 
 	function unhideAllSeries() {
 		series.transition()
 			.duration(300)
-			.attr("fill", (datum) => color(datum[0].rank))
-			.attr("stroke", (datum) => color(datum[0].rank));
+			.attr("fill", function () { return this.color; })
+			.attr("stroke", function () { return this.color; });
 
 		series.selectAll("text")
 			.transition()
@@ -334,19 +333,26 @@ function drawBumpChart(data) {
 		leftY.selectAll(".tick text")
 			.transition()
 			.duration(300)
-			.attr("fill", "black")
+			.attr("fill", "#0F2C59")
 
 		rightY.selectAll(".tick text")
 			.transition()
 			.duration(300)
-			.attr("fill", "black")
+			.attr("fill", "#0F2C59")
 	}
 }
 
-d3.csv("./dataset/top10source.csv").then(function (data) {
+d3.csv("./dataset/top_15_origins.csv").then(function (data) {
 	data.forEach(function (d) {
 		d.year = +d.year;
 		d.student = +d.student;
 	});
-	drawBumpChart(data);
+
+	const opts = {
+		categoryColumn: "country",
+		timeColumn: "year",
+		comparisonColumn: "students"
+	}
+
+	drawBumpChart("#bump", data, opts, 15);
 });

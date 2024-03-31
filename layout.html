@@ -17,13 +17,13 @@
 
     <!-- Importing D3.js library -->
     <script src="//d3js.org/d3.v6.min.js"></script>
-    <script src="https://unpkg.com/topojson@3"></script>
-    <script src="navigation_bar.js" defer></script>
-    <script src="section_2.js" defer></script>
+    <script src="https://unpkg.com/d3-array@1"></script>
+    <script src="https://unpkg.com/d3-collection@1"></script>
+    <script src="https://unpkg.com/d3-path@1"></script>
+    <script src="https://unpkg.com/d3-shape@1"></script>
+    <script src="https://unpkg.com/d3-sankey@0"></script>
     
-    <script src="script.js" defer></script>
-    <script src="bumpchart.js" defer></script>
-    <script src="barchart.js"></script>
+    <script src="navigation_bar.js" defer></script>
 </head>
 <style>
     * {
@@ -57,7 +57,8 @@
     }
 
     .section-dark {
-        background-color: #EADBC8;
+        /* background-color: #EADBC8; */
+        background-color: #F8F0E5;
     }
 
     h1 {
@@ -68,6 +69,39 @@
         max-width: 64rem;
         margin: 0 auto;
     }
+
+    .layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 0 2rem;
+    }
+
+    .section-text {
+        height: fit-content;
+    }
+
+    .bump-chart {
+        grid-column: 1 / 2;
+        grid-row: 1 / 3;
+        align-self: end;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .sankey-chart {
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+    }
+
+    .line-chart {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+    }
+
+
 </style>
 <body>
     <nav class="navigation">
@@ -76,50 +110,50 @@
             <li><a href="#section-2"></a></li>
             <li><a href="#section-3"></a></li>
             <li><a href="#section-4"></a></li>
-            <li><a href="#section-5"></a></li>
-            <li><a href="#section-6"></a></li>
-            <li><a href="#section-7"></a></li>
-            <li><a href="#section-8"></a></li>
-            <li><a href="#section-9"></a></li>
-            <li><a href="#section-10"></a></li>
         </ul>
     </nav>
     <div class="parent">
         <div id="section-1" class="section section-light">
-            <h1>International student migration around the world.</h1>
+            <h1>International student migration around the world - origins and destinations</h1>
+            <p>by Ta Quang Tung, Nguyen Quang Huy</p>
+            <p>
+                Thanks to greater economic prosperity and the convenience of international travel, people are becoming more
+                mobile than before. No longer are people tied down to their country of origin - they can now travel the world to
+                look for a better life in other countries. Among these migrants, many leave their homes in search of better
+                educational opportunities. Between 2017 and 2021, an estimated 30 million people migrated to study overseas.
+                These international students play an important cultural and socio-economic role in the places they arrive at.
+                This visualization project aims to give readers an overview of international student migration by looking at
+                where these students came from and where they headed.
+            </p>
         </div>
         <div id="section-2" class="section section-dark">
-            <h1>In 2021, about 3.5% of the world population were migrants. That was 281 million people in total.</h1>
+            <h2>Origins of international students</h2>
+            <div class="layout">
+                <div class="bump-chart" id="bump">
+                    <p class="section-text">
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque fuga voluptas nobis odio libero at dolorum assumenda omnis. Dolor illum labore rerum, sed tempora harum qui vel illo dolorem ad cumque exercitationem, odit nemo similique pariatur id? Atque quos reiciendis, odit a aspernatur nesciunt doloribus nemo voluptas expedita veniam id molestiae eligendi culpa esse dolore, eaque vero cupiditate repellat cumque ducimus ea voluptatum amet. Amet perspiciatis quo sit nobis repellendus hic nulla exercitationem a! Harum, quas? Accusamus, amet nostrum ut facilis quo excepturi fugit quam! Accusantium eveniet, explicabo sapiente suscipit sunt aliquam qui voluptatibus sit molestiae ipsa corrupti iusto officiis?
+                    </p>
+                    <h3>Top 15 countries with the most outbound international students</h3>
+                </div>
+                <div class="sankey-chart" id="sankey">
+                    <h3 id="sankey-title">Preferred destination of students from China from 2017 to 2021</h3>
+                </div>
+                <div class="line-chart" id="line-chart">
+                    <h3 id="line-title">Number of students from China to United States of America between 2017 to 2021</h3>
+                </div>
+            </div>
         </div>
         <div id="section-3" class="section section-light">
-            <h1>Among these migrants, about 2.2% are students.</h1>
-            <p>Another waffle chart here.</p>
+            <h2>Destinations of international students</h2>
         </div>
         <div id="section-4" class="section section-dark">
-            <h1>These are the top destination countries for international students.</h1>
-        </div>
-        <div id="section-5" class="section section-light">
-            <h1>Here's a closer look at where students to said countries came from.</h1>
-        </div>
-        <div id="section-6" class="section section-dark">
-            <h1>These were the top source countries of international students.</h1>
-            <div id="bump"></div>
-        </div>
-        <div id="section-7" class="section section-light">
-            <h1>Here's a breakdown of where students from these countries went to.</h1>
-            <div id="bar-chart"></div>
-        </div>
-        <div id="section-8" class="section section-dark">
-            <h1>Key takeaways</h1>
-        </div>
-        <div id="section-9" class="section section-light">
-            <h1>Explore more</h1>
-            <p id="chart"></p>
-        </div>
-        <div id="section-10" class="section section-dark">
             <h1>References</h1>
         </div>
     </div>
+
+    <script src="bumpchart.js"></script>
+    <script src="sankey.js"></script>
+    <script src="linechart.js"></script>
 </body>
 <footer>COS30045 Data Visualisation</footer>
 </html>
