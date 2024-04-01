@@ -28,7 +28,7 @@ const svg = d3.select("#sankey")
 const linkGroup = svg.append("g")
                     .attr("id", "linkGroup")
                     .attr("fill", "none")
-                    .attr("stroke-opacity", .4);
+                    .attr("stroke-opacity", .3);
 
 const nodeGroup = svg.append("g")
                     .attr("id", "nodeGroup");
@@ -38,16 +38,25 @@ d3.csv("./dataset/final.csv").then(data => {
 
     document.getElementById("sankey").addEventListener("seriesLocked", (e) => {
         sankeyTitle.textContent = `Preferred destination of students from ${e.detail} from 2017 to 2021`;
-        drawSankey(data, e.detail);
+        const { topDestinationName, topDestinationColor } = drawSankey(data, e.detail);
+
+        const customData = {
+            source: e.detail,
+            destination: topDestinationName,
+            color: topDestinationColor
+        };
+
+        lineChart.dispatchEvent(new CustomEvent("sourceDestinationLocked", {
+            detail: customData
+        }));
     });
 });
 
 function drawSankey(data, sourceCountry) {
-    const countryData = data.filter(e => e.source === sourceCountry);
+    const countryData = data.filter(e => e.source === sourceCountry).sort((a, b) => b.students - a.students);
 
     const obj = { }
     obj[sourceCountry] = countryData.map(e => e.destination);
-    console.log(obj);
 
     const links = countryData.map(d => ({ source: d.source, target: d.destination, value: d.students }));
     const nodes = Array.from(new Set(countryData.flatMap(d => [d.source, d.destination])), name => ({ name: name }));
@@ -102,7 +111,6 @@ function drawSankey(data, sourceCountry) {
                                     .attr("stroke", d => `url(#gradient-${d.index})`);
                             })
                             .on("click", function (e, d) {
-                                console.log(d)
                                 const customData = {
                                     source: d.source.name,
                                     destination: d.target.name,
@@ -126,7 +134,7 @@ function drawSankey(data, sourceCountry) {
             .attr("offset", "0%")
             .attr("stop-color", color(datum.source.index));
         gradient.append("stop")
-            .attr("offset", "75%")
+            .attr("offset", "60%")
             .attr("stop-color", color(datum.source.index));
         gradient.append("stop")
             .attr("offset", "100%")
@@ -141,7 +149,7 @@ function drawSankey(data, sourceCountry) {
             .attr("offset", "0%")
             .attr("stop-color", d3.rgb(color(datum.source.index)).darker(2));
         gradientDarker.append("stop")
-            .attr("offset", "75%")
+            .attr("offset", "60%")
             .attr("stop-color", d3.rgb(color(datum.source.index)).darker(2));
         gradientDarker.append("stop")
             .attr("offset", "100%")
@@ -162,6 +170,19 @@ function drawSankey(data, sourceCountry) {
                             .attr("width", sankey.nodeWidth())
                             .attr("height", d => d.y1 - d.y0)
                             .style("fill", d => color(d.index))
+                            .on("click", function (e, d) {
+                                if (d.targetLinks.length === 0) return;
+
+                                const customData = {
+                                    source: d.targetLinks[0].source.name,
+                                    destination: d.name,
+                                    color: color(d.index)
+                                };
+
+                                lineChart.dispatchEvent(new CustomEvent("sourceDestinationLocked", {
+                                    detail: customData
+                                }));
+                            });
 
                 nodeItemGroup.select("rect")
                             .selectAll("title")
@@ -181,5 +202,10 @@ function drawSankey(data, sourceCountry) {
                             .attr("dominant-baseline", "middle")
                             .attr("pointer-events", "none")
                             .text(function (d) { return d.name; });
-            });        
+            });
+            
+    return {
+        topDestinationName: countryData[0].destination,
+        topDestinationColor: color(1)
+    }
 }

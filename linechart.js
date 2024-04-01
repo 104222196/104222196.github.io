@@ -1,5 +1,5 @@
 // Setting dimensions
-const lineChartMagins = { top: 20, right: 20, bottom: 20, left: 64 },
+const lineChartMagins = { top: 20, right: 20, bottom: 20, left: 80 },
 	lineChartWidth = 800 - lineChartMagins.left - lineChartMagins.right,
 	lineChartHeight = 250 - lineChartMagins.top - lineChartMagins.bottom;
 
@@ -11,7 +11,7 @@ const lineChartSvg = d3
 	.append("svg")
 	.attr("width", lineChartWidth + lineChartMagins.left + lineChartMagins.right)
 	.attr("height", 300 + lineChartMagins.top + lineChartMagins.bottom)
-	.attr("viewBox", `0 40 ${lineChartWidth + 80} ${lineChartHeight}`)
+	//.attr("viewBox", `0 40 ${lineChartWidth + 80} ${lineChartHeight}`)
 	.append("g")
 	.attr("transform", `translate(${lineChartMagins.left}, ${lineChartMagins.top})`);
 
@@ -56,10 +56,18 @@ function drawLineChart(data, sourceCountry, destinationCountry, color) {
 					.duration(300)
 					.call(d3.axisBottom(xScale).ticks(d3.timeYear.every(1)));
 
+	lineChartXGroup.selectAll("text")
+					.attr("font-weight", "bold")
+					.attr("font-size", ".8rem");
+
 	// Adding the y Axis
 	lineChartYGroup.transition()
 					.duration(300)
 					.call(d3.axisLeft(yScale));
+
+	lineChartYGroup.selectAll("text")
+					.attr("font-weight", "bold")
+					.attr("font-size", ".8rem");
 
 	// Drawing line with inner gradient and area
 	const line = d3.line()
@@ -73,25 +81,33 @@ function drawLineChart(data, sourceCountry, destinationCountry, color) {
 		.y1(d => yScale(d.students));
 
 	// Defining the line path and adding some styles
-	linePath.attr("d", line(chartData))
-			.attr("stroke", color);
+	linePath.attr("stroke", color)
+			.transition()
+			.duration(300)
+			.attr("d", line(chartData));
+			
 		
 	lineChartSvg.selectAll("circle")
 		.data(chartData)
 		.join("circle")
-		.attr("cx", d => xScale(new Date(d.year)))
-		.attr("cy", d => yScale(d.students))
 		.attr("r", 4)
 		.attr("stroke", color)
 		.attr("fill", "white")
+		.transition()
+		.duration(300)
+		.attr("cx", d => xScale(new Date(d.year)))
+		.attr("cy", d => yScale(d.students));
 
 	// Drawing animated area
-	lineArea.attr("d", area(chartData))
-			.attr("fill", color)
+	lineArea.attr("fill", color)
+			.transition()
+			.duration(300)
+			.attr("d", area(chartData));
+			
 }
 
 d3.json("./dataset/source_destination_pair.json").then(data => {
-	drawLineChart(data, "China", "Australia", "rgb(242, 142, 44)");
+	drawLineChart(data, "China", "United States of America", "rgb(242, 142, 44)");
 
 	document.querySelector("#line-chart").addEventListener("sourceDestinationLocked", (e) => {
 		const { source, destination, color } = e.detail;
