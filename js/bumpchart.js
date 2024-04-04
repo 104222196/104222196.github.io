@@ -2,20 +2,13 @@ const w = 950;
 const h = 600;
 const bumpRadius = 10;
 const padding = 20;
-const margin = { left: 175, right: 175, top: 20, bottom: 50 };
+const margin = { left: 175, right: 175, top: 20, bottom: 24 };
 
-let isSeriesLocked = false;
-const sankeyDiagram = document.getElementById("sankey");
-
-function seq(start, length) {
-	return Array.apply(null, { length: length }).map((d, i) => i + start);
-}
-
-function drawBumpChart(rootId, data, headerOptions, rankingLimit) {
+function drawBumpChart(root, data, headerOptions, rankingLimit, getLockedState, setLockedState, handleSeriesClick) {
 	const { categoryColumn, timeColumn, comparisonColumn } = headerOptions;
-
+	
 	const svg = d3
-		.select(rootId)
+		.select(root)
 		.append("svg")
 		.attr("width", w)
 		.attr("height", h);
@@ -28,7 +21,7 @@ function drawBumpChart(rootId, data, headerOptions, rankingLimit) {
 		.attr("fill", "transparent")
 		.attr("z-index", "-100")
 		.on("click", () => {
-			isSeriesLocked = false;
+			setLockedState(false);
 			unhideAllSeries();
 		});
 
@@ -175,20 +168,20 @@ function drawBumpChart(rootId, data, headerOptions, rankingLimit) {
 		.attr("cursor", "pointer")
 		.attr("transform", `translate(${margin.left + padding}, 0)`)
 		.on("mouseover", (e, d) => {
-			if (!isSeriesLocked) {
+			if (!getLockedState()) {
 				hideAllSeries();
 				highlightSeries(d);
 			}
 		})
 		.on("mouseout", (e, d) => {
-			if (!isSeriesLocked) {
+			if (!getLockedState()) {
 				unhighlightSeries(d);
 				unhideAllSeries(d);
 			}
 		})
 		.on("click", (e, d) => {
-			isSeriesLocked = true;
-			sankeyDiagram.dispatchEvent(new CustomEvent("seriesLocked", { detail: d.category }));
+			setLockedState(true);
+			handleSeriesClick(d);
 			hideAllSeries();
 			highlightSeries(d);
 		});
@@ -342,17 +335,6 @@ function drawBumpChart(rootId, data, headerOptions, rankingLimit) {
 	}
 }
 
-d3.csv("./dataset/top_15_origins.csv").then(function (data) {
-	data.forEach(function (d) {
-		d.year = +d.year;
-		d.student = +d.student;
-	});
-
-	const opts = {
-		categoryColumn: "country",
-		timeColumn: "year",
-		comparisonColumn: "students"
-	}
-
-	drawBumpChart("#bump", data, opts, 15);
-});
+function seq(start, length) {
+	return Array.apply(null, { length: length }).map((d, i) => i + start);
+}
