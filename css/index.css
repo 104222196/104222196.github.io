@@ -11,21 +11,23 @@ body {
 }
 
 .parent {
-    scroll-snap-type: y mandatory;
+    /* scroll-snap-type: y mandatory; */
     height: 100vh;
     overflow-y: scroll;
     scroll-behavior: smooth;
 }
 
 .section {
-    height: 100vh;
+    /* height: 100vh;
     height: 100dvh;
-    scroll-snap-align: start;
-    padding: 2rem;
+    scroll-snap-align: start; */
+    padding: 32px;
     background-color: #F8F0E5;
 }
 
 #introduction, #references {
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     align-items: center;
 }
@@ -37,7 +39,7 @@ body {
 
 #introduction div p, #references div p {
     margin: 2rem 0;
-    font-size: 1.25rem;
+    font-size: 20px;
     line-height: 1.5;
     text-align: justify;
 }
@@ -47,11 +49,16 @@ body {
 }
 
 h1 {
-    font-size: 4rem;
+    font-size: 64px;
 }
 
 h2 {
-    font-size: 2rem;
+    font-size: 32px;
+}
+
+p {
+    font-size: 16px;
+    margin: 1rem 0;
 }
 
 h3 {
@@ -60,6 +67,10 @@ h3 {
 
 h3 + p {
     text-align: center;
+}
+
+strong {
+    font-size: 20px;
 }
 
 .center {
@@ -71,7 +82,7 @@ h3 + p {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
-    gap: 1rem 2rem;
+    gap: 16px 32px;
 }
 
 .section-text {
@@ -97,4 +108,8 @@ h3 + p {
 .line-chart {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
+}
+
+.directions {
+    background-color: rgba(255, 146, 146, 0.575);
 }

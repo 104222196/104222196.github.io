@@ -1,9 +1,12 @@
+const sankeyScreenRatio = window.innerWidth / 1920;
+const sankeyAspectRatio = 800 / 450;
+
 // set the dimensions and sankeyDiagramMarginss of the graph
-const sankeyDiagramMargins = { top: 10, right: 0, bottom: 10, left: 0 };
-const sankeyDiagramWidth = 800 - sankeyDiagramMargins.left - sankeyDiagramMargins.right;
-const sankeyDiagramHeight = 450 - sankeyDiagramMargins.top - sankeyDiagramMargins.bottom;
-const sankeyNodeWidth = 36;
-const sankeyNodePadding = 10;
+const sankeyDiagramMargins = { top: 10 * sankeyScreenRatio, right: 0 * sankeyScreenRatio, bottom: 10 * sankeyScreenRatio, left: 0 * sankeyScreenRatio };
+const sankeyDiagramWidth = 800 * sankeyScreenRatio - sankeyDiagramMargins.left - sankeyDiagramMargins.right;
+const sankeyDiagramHeight = sankeyDiagramWidth / sankeyAspectRatio - sankeyDiagramMargins.top - sankeyDiagramMargins.bottom;
+const sankeyNodeWidth = 36 * sankeyScreenRatio;
+const sankeyNodePadding = 10 * sankeyScreenRatio;
 
 // Color scale used
 const color = d3.scaleOrdinal(d3.schemeTableau10);

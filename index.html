@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
-    <link href="./css/navigation_bar.css" rel="stylesheet">
+    <!-- <link href="./css/navigation_bar.css" rel="stylesheet"> -->
     <link href="./css/index.css" rel="stylesheet">
 
     <!-- Importing D3.js library -->
@@ -27,14 +27,14 @@
 
 <body>
 
-    <nav class="navigation">
+    <!-- <nav class="navigation">
         <ul>
             <li><a href="#introduction" class="active"></a></li>
             <li><a href="#origins"></a></li>
             <li><a href="#destinations"></a></li>
             <li><a href="#references"></a></li>
         </ul>
-    </nav>
+    </nav> -->
 
     <div class="parent">
 
@@ -76,11 +76,11 @@
                         Germany, France, Italy).
                     </p>
                     <h3>Top 15 origin countries with the most international students</h3>
-                    <p>Click on a series to see the preferred destinations of a country on the right.</p>
+                    <p class="directions"><strong>Click</strong> on a series to see the preferred destinations of a country on the right.</p>
                 </div>
                 <div class="sankey-chart" id="origin-sankey">
                     <h3 id="origin-sankey-title">Preferred destination of students from China (2017-2021)</h3>
-                    <p>Click on a link to see how the numbers have changed for this destination.
+                    <p class="directions"><strong>Click</strong> on a link to see how the numbers have changed for this destination.
                     </p>
                 </div>
                 <div class="line-chart" id="origin-line">
@@ -100,13 +100,13 @@
                         their rankings increased over the period. That said, the majority of students who came to these
                         Asian countries were from Asia.</p>
                     <h3>Top 15 destination countries with the most international students</h3>
-                    <p>Click on a series to see the origins of the students to that country on the right. 2019 data is
+                    <p class="directions"><strong>Click</strong> on a series to see the origins of the students to that country on the right. 2019 data is
                         not available for the USA.</p>
                 </div>
                 <div class="sankey-chart" id="destination-sankey">
                     <h3 id="destination-sankey-title">Origins of students to United States of America (2017-2021)
                     </h3>
-                    <p>Click on a link to see how the numbers have changed for that origin.
+                    <p class="directions"><strong>Click</strong> on a link to see how the numbers have changed for that origin.
                     </p>
                 </div>
                 <div class="line-chart" id="destination-line">
@@ -134,7 +134,7 @@
 
     </div>
 
-    <script src="./js/navigation_bar.js"></script>
+    <!-- <script src="./js/navigation_bar.js"></script> -->
     <script src="./js/bumpchart.js"></script>
     <script src="./js/sankey.js"></script>
     <script src="./js/linechart.js"></script>

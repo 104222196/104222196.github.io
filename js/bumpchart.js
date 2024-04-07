@@ -1,8 +1,11 @@
-const w = 950;
-const h = 600;
-const bumpRadius = 10;
-const padding = 20;
-const margin = { left: 175, right: 175, top: 20, bottom: 24 };
+const bumpScreenRatio = window.innerWidth / 1920;
+const bumpAspectRatio = 950 / 600;
+
+const w = 950 * bumpScreenRatio;
+const h = w / bumpAspectRatio;
+const bumpRadius = 10 * bumpScreenRatio;
+const padding = 20 * bumpScreenRatio;
+const margin = { left: Math.max(160, 175 * bumpScreenRatio), right: Math.max(160, 175 * bumpScreenRatio), top: 20 * bumpScreenRatio, bottom: 24 * bumpScreenRatio };
 
 function drawBumpChart(root, data, headerOptions, rankingLimit, getLockedState, setLockedState, handleSeriesClick) {
 	const { categoryColumn, timeColumn, comparisonColumn } = headerOptions;
@@ -132,7 +135,7 @@ function drawBumpChart(root, data, headerOptions, rankingLimit, getLockedState, 
 		)
 		.selectAll("text")
 		.attr("font-family", "Inter")
-		.attr("font-size", ".8rem");
+		.attr("font-size", "12px");
 
 	// Left and right Y axes.
 	const y = d3.scalePoint().range([margin.top, h - margin.bottom - padding]);
@@ -142,7 +145,7 @@ function drawBumpChart(root, data, headerOptions, rankingLimit, getLockedState, 
 
 	leftY.selectAll("text")
 		.attr("font-family", "Inter")
-		.attr("font-size", ".8rem");
+		.attr("font-size", "12px");
 
 	const rightY = svg
 		.append("g")
@@ -153,7 +156,7 @@ function drawBumpChart(root, data, headerOptions, rankingLimit, getLockedState, 
 	rightY
 		.selectAll("text")
 		.attr("font-family", "Inter")
-		.attr("font-size", ".8rem");
+		.attr("font-size", "12px");
 
 	// SERIES RELATED STUFF
 

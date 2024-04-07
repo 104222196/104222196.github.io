@@ -209,3 +209,6 @@ d3.json("./dataset/destination_line_data.json").then(data => {
 		return chartData;
 	}
 });
+
+console.log(window.innerWidth);
+console.log(window.innerHeight)

@@ -1,6 +1,9 @@
-const lineChartMargins = { top: 20, right: 20, bottom: 20, left: 80 };
-const lineChartWidth = 800 - lineChartMargins.left - lineChartMargins.right;
-const lineChartHeight = 250 - lineChartMargins.top - lineChartMargins.bottom;
+const lineScreenRatio = window.innerWidth / 1920;
+const lineAspectRatio = 800 / 250;
+
+const lineChartMargins = { top: 20 *lineScreenRatio, right: 20 *lineScreenRatio, bottom: Math.max(32, 20 *lineScreenRatio), left: 80 *lineScreenRatio };
+const lineChartWidth = 800 * lineScreenRatio - lineChartMargins.left - lineChartMargins.right;
+const lineChartHeight = lineChartWidth / lineAspectRatio - lineChartMargins.top - lineChartMargins.bottom;
 
 function drawLineChart(root, data, color = "rgb(242, 142, 44)") {
 	const rootElement = d3.select(root);
@@ -18,7 +21,7 @@ function drawLineChart(root, data, color = "rgb(242, 142, 44)") {
 		: svg.append("g")
 			.attr("id", "xAxis")
 			.attr("font-weight", "bold")
-			.attr("font-size", "1rem")
+			.attr("font-size", "16px")
 			.attr("transform", "translate(0," + lineChartHeight + ")");
 
 	const yGroup = svg.select("#yAxis").node()
@@ -26,7 +29,7 @@ function drawLineChart(root, data, color = "rgb(242, 142, 44)") {
 		: svg.append("g")
 			.attr("id", "yAxis")
 			.attr("font-weight", "bold")
-			.attr("font-size", "1rem");
+			.attr("font-size", "16px");
 
 	const linePath = svg.select("#linePath").node()
 		? svg.select("#linePath")
@@ -77,7 +80,7 @@ function drawLineChart(root, data, color = "rgb(242, 142, 44)") {
 
 	xGroup.selectAll("text")
 		.attr("font-weight", "bold")
-		.attr("font-size", ".8rem");
+		.attr("font-size", "12px");
 
 	// Adding the y Axis
 	yGroup.transition()
@@ -86,7 +89,7 @@ function drawLineChart(root, data, color = "rgb(242, 142, 44)") {
 
 	yGroup.selectAll("text")
 		.attr("font-weight", "bold")
-		.attr("font-size", ".8rem");
+		.attr("font-size", "12px");
 
 	// Drawing line with inner gradient and area
 	const line = d3.line()
